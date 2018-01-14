@@ -1,0 +1,20 @@
+{
+
+  "manifest_version": 2,
+  "name": "GLS_Invoice_Parsing",
+  "version": "1.0",
+
+  "description": "Adds a textbox to the GLS online banking, to extract IBAN, BIC, etc. from the invoice text.",
+
+  "icons": {
+    "48": "icons/invoice-parsing-48.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.gls-online-filiale.de/*"],
+      "js": ["invoice_parsing.js"]
+    }
+  ]
+
+}
