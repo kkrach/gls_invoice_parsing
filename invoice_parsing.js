@@ -1,4 +1,10 @@
-
+/**
+ * Script to add a textbox to the GLS online banking, to extract IBAN, BIC, etc. from invoice text.
+ *
+ * Author: Karl Krach <github@kkrach.de>
+ * Date:   2018/01/14
+ * Tested: Firefox 57.0.4 (64 bit)
+ */
 
 var recv_form = document.getElementById("ID_INPUT_EMPFAENGERNAME");
 if (recv_form) {
