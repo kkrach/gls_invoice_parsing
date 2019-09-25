@@ -77,40 +77,55 @@ function parse_invoice_text() {
 	for (var cnt=0; cnt < invoice_lines.length; cnt++) {
 		var line = invoice_lines[cnt];
 		if (line.trim().length > 0) {
-			if ((result = line.match(/IBAN:(.*)/i)) != null) {
+			if ((result = line.match(/IBAN *:? *(DE[0-9 ]*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
 				write_value("IBAN", "ID_INPUT_IBAN", result[1]);
 			}
-			else if ((result = line.match(/.*BIC.*:(.*)/i)) != null) {
+			else if ((result = line.match(/.*BIC.*:? *([A-Z0-9]*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
 				write_value("BIC", "ID_INPUT_BIC", result[1].replace(/\(.*\)/,""));
 			}
-			else if ((result = line.match(/Verwendungszweck:(.*)/i)) != null) {
+			else if ((result = line.match(/Verwendungszweck *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
 				write_value("Verwendungszweck", "ID_INPUT_VERWENDUNGSZWECK1", result[1]);
 			}
-			else if ((result = line.match(/Betreff:(.*)/i)) != null) {
+			else if ((result = line.match(/Betreff *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
 				write_value("Verwendungszweck", "ID_INPUT_VERWENDUNGSZWECK1", result[1]);
 			}
-			else if ((result = line.match(/Empfänger:(.*)/i)) != null) {
+			else if ((result = line.match(/Empfänger *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
 				write_value("Empfänger", "ID_INPUT_EMPFAENGERNAME", result[1]);
 			}
-			else if ((result = line.match(/Inhaber:(.*)/i)) != null) {
+			else if ((result = line.match(/Inhaber *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
 				write_value("Empfänger", "ID_INPUT_EMPFAENGERNAME", result[1]);
 			}
-			else if ((result = line.match(/Betrag:(.*)/i)) != null) {
+			else if ((result = line.match(/Summe *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("Empfänger", "ID_INPUT_BETRAG", result[1].replace(/EUR/,""));
+				write_value("Betrag", "ID_INPUT_BETRAG", result[1].replace(/EUR|€/,""));
+			}
+			else if ((result = line.match(/Betrag *:?(.*)/i)) != null) {
+				// use next line, if result[1] is empty
+				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
+				write_value("Betrag", "ID_INPUT_BETRAG", result[1].replace(/EUR|€/,""));
+			}
+			else if ((result = line.match(/Total *:?(.*)/i)) != null) {
+				// use next line, if result[1] is empty
+				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
+				write_value("Betrag", "ID_INPUT_BETRAG", result[1].replace(/EUR|€/,""));
+			}
+			else if ((result = line.match(/Gesamt *:?(.*)/i)) != null) {
+				// use next line, if result[1] is empty
+				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
+				write_value("Betrag", "ID_INPUT_BETRAG", result[1].replace(/EUR|€/,""));
 			}
 			else {
 //				console.log("Unparseable: " + line);
