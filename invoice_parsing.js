@@ -77,6 +77,7 @@ function parse_recv_from(recv_form) {
 		var right_button = document.createElement("button");
 		right_button.type = "button";
 		right_button.className = "v-nativebutton v-button";
+		right_button.style.marginTop = "10px";
 		right_button.onclick = parse_invoice_text;
 		right_deco1.appendChild(right_button);
 
