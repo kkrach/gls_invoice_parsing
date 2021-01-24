@@ -6,65 +6,125 @@
  * Tested: Firefox 57.0.4 (64 bit)
  */
 
-var recv_form = document.getElementById("ID_INPUT_EMPFAENGERNAME");
+console.log("Loaded script of 'gls_invoice_parsing.");
+
+var recv_form = document.getElementById("empfaenger");
 if (recv_form) {
-	var regex = /BOX_.*_content/;
-	var parent_content = recv_form.parentNode;
-	while (parent_content && !(parent_content.id && parent_content.id.match(regex))) {
-		parent_content = parent_content.parentNode;
-	}
-	if (parent_content) {
-		var container = document.createElement("div");
-		container.className = "gad-block ym-grid ym-clearfix";
-
-		var left_column = document.createElement("div");
-		left_column.className = "gad-blockHeader ym-g30 ym-gl";
-		container.appendChild(left_column);
-		var left_label = document.createElement("label");
-		left_label.for = "invoice_input";
-		left_label.className = "gad-label";
-		left_column.appendChild(left_label);
-		var label_text = document.createTextNode("Rechnungstext:");
-		left_label.appendChild(label_text);
-
-		var right_column = document.createElement("div");
-		right_column.className = "gad-blockContent ym-g70 ym-gr";
-		container.appendChild(right_column);
-		// Create input field
-		var right_deco1 = document.createElement("div");
-		right_deco1.className = "gad-decoratedControl ym-g70";
-		right_column.appendChild(right_deco1);
+	parse_recv_from(recv_form);
+}
+else {
+	console.log("Cannot find matching input box! Trying again in one second...");
+	setTimeout(function() {
+		var recv_form = document.getElementById("empfaenger");
+		if (recv_form) {
+			console.log("Found input box after timeout!");
+			parse_recv_from(recv_form);
+		}
+		else {
+			console.log("Cannot find matching input box!");
+		}
+	}, 2000);
+}
 		var right_input = document.createElement("textarea");
 		right_input.id = "KKR_invoice_input";
 		right_input.rows = "6";
 		right_input.className = "gad-control gad-input";
+
+
+
+
+function parse_recv_from(recv_form) {
+	var parent_content = recv_form.parentNode;
+	while (parent_content && !parent_content.classList.contains("v-csslayout-forms-field-group")) {
+		parent_content = parent_content.parentNode;
+	}
+	if (parent_content) {
+		var container = document.createElement("div");
+		container.className = "KKK v-csslayout v-layout v-widget forms-field-group v-csslayout-forms-field-group";
+
+		// Left column: label
+		var left_column = document.createElement("div");
+		left_column.className = "KKK v-csslayout v-layout v-widget block v-csslayout-block";
+		container.appendChild(left_column);
+
+		var caption = document.createElement("div");
+		caption.className = "KKK v-caption v-caption-label";
+		left_column.appendChild(caption);
+
+		var caption_text = document.createElement("div");
+		caption_text.className = "KKK v-captiontext";
+		caption.appendChild(caption_text);
+
+		var text_node = document.createTextNode("Rechnungstext:");
+		caption_text.appendChild(text_node);
+
+		// Right column: text area
+		var right_column = document.createElement("div");
+		right_column.className = "KKK v-csslayout v-layout v-widget block v-csslayout-block";
+		container.appendChild(right_column);
+
+		var right_deco1 = document.createElement("span");
+		right_deco1.className = "twitter-typeahead";
+		//style="position: relative; direction: ltr;"
+		right_column.appendChild(right_deco1);
+
+		var right_input = document.createElement("textarea");
+		right_input.id = "KKR_invoice_input";
+		right_input.rows = "6";
+		right_input.className = "v-widget v-textarea";
 		right_deco1.appendChild(right_input);
-		// Create "Parse" button
-		var right_deco2 = document.createElement("div");
-		right_deco2.className = "gad-decoratedControl ym-g70";
-		right_column.appendChild(right_deco2);
+
 		var right_button = document.createElement("button");
 		right_button.type = "button";
-		right_button.className = "gad-button";
+		right_button.className = "v-nativebutton v-button";
 		right_button.onclick = parse_invoice_text;
-		right_deco2.appendChild(right_button);
-		var button_text = document.createTextNode("Rechnungstext auswerten");
-		right_button.appendChild(button_text);
+		right_deco1.appendChild(right_button);
 
-		parent_content.insertBefore(container, parent_content.firstChild);
+		var right_span = document.createElement("span");
+		right_span.className = "v-nativebutton-caption";
+		right_button.appendChild(right_span);
+
+		var button_text = document.createTextNode("Rechnungstext auswerten");
+		right_span.appendChild(button_text);
+
+		var node = parent_content.parentNode.insertBefore(container, parent_content);
+		if (!node) console.log("Something went wrong during insertion...");
+	}
+	else {
+		console.log("Cannot determine right parent node!");
 	}
 }
+
 function write_value(name, id, value) {
-	var trimmed = value.trim();
 	var input = document.getElementById(id);
 	if (!input) {
 		console.log("Error: Cannot find " + name + " input!");
 	}
 	else {
+		var trimmed = value.trim();
 		input.value = trimmed;
 		console.log("Written '" + trimmed + "' to " + name + " field.");
 	}
 }
+
+function write_child_input(name, id, value) {
+	var par = document.getElementById(id);
+	if (!par) {
+		console.log("Error: Cannot find parent for " + name + " input!");
+	}
+	else {
+		var inputs = par.getElementsByTagName("INPUT");
+		if (inputs.length !== 1) {
+			console.log("Error: Found " + inputs.length + " inputs of " + name);
+		}
+		else {
+			var trimmed = value.trim();
+			inputs[0].value = trimmed;
+			console.log("Written '" + trimmed + "' to child input of " + name + ".");
+		}
+	}
+}
+
 function parse_invoice_text() {
 	var invoice_text_box = document.getElementById("KKR_invoice_input");
 	if (!invoice_text_box) {
@@ -77,58 +137,58 @@ function parse_invoice_text() {
 	for (var cnt=0; cnt < invoice_lines.length; cnt++) {
 		var line = invoice_lines[cnt];
 		if (line.trim().length > 0) {
-			if ((result = line.match(/IBAN *:? *(DE[0-9 ]*)/i)) != null) {
+			if ((result = line.match(/IBAN *:? *(D?E?[0-9 ]*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("IBAN", "ID_INPUT_IBAN", result[1]);
+				write_value("IBAN", "empfaengerIBAN", result[1]);
 			}
-			else if ((result = line.match(/.*BIC.*:? *([A-Z0-9]*)/i)) != null) {
+			else if ((result = line.match(/.*BIC *:? *([A-Z0-9]*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("BIC", "ID_INPUT_BIC", result[1].replace(/\(.*\)/,""));
+				//write_value("BIC", "ID_INPUT_BIC", result[1].replace(/\(.*\)/,""));
 			}
 			else if ((result = line.match(/Verwendungszweck *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("Verwendungszweck", "ID_INPUT_VERWENDUNGSZWECK1", result[1]);
+				write_value("Verwendungszweck", "verwendungszweck", result[1]);
 			}
 			else if ((result = line.match(/Betreff *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("Verwendungszweck", "ID_INPUT_VERWENDUNGSZWECK1", result[1]);
+				write_value("Verwendungszweck", "verwendungszweck", result[1]);
 			}
 			else if ((result = line.match(/Empfänger *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("Empfänger", "ID_INPUT_EMPFAENGERNAME", result[1]);
+				write_value("Empfänger", "empfaenger", result[1]);
 			}
 			else if ((result = line.match(/Inhaber *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("Empfänger", "ID_INPUT_EMPFAENGERNAME", result[1]);
+				write_value("Empfänger", "empfaenger", result[1]);
 			}
 			else if ((result = line.match(/Summe *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("Betrag", "ID_INPUT_BETRAG", result[1].replace(/EUR|€/,""));
+				write_child_input("Betrag", "betrag", result[1].replace(/EUR|€/,""));
 			}
 			else if ((result = line.match(/Betrag *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("Betrag", "ID_INPUT_BETRAG", result[1].replace(/EUR|€/,""));
+				write_child_input("Betrag", "betrag", result[1].replace(/EUR|€/,""));
 			}
 			else if ((result = line.match(/Total *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("Betrag", "ID_INPUT_BETRAG", result[1].replace(/EUR|€/,""));
+				write_child_input("Betrag", "betrag", result[1].replace(/EUR|€/,""));
 			}
 			else if ((result = line.match(/Gesamt *:?(.*)/i)) != null) {
 				// use next line, if result[1] is empty
 				if (result[1].trim().length == 0) result[1] = invoice_lines[++cnt];
-				write_value("Betrag", "ID_INPUT_BETRAG", result[1].replace(/EUR|€/,""));
+				write_child_input("Betrag", "betrag", result[1].replace(/EUR|€/,""));
 			}
 			else {
-//				console.log("Unparseable: " + line);
+				console.log("Unparseable: " + line);
 				unparseable += line + "\n";
 			}
 		}

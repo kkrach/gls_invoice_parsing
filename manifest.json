@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "GLS_Invoice_Parsing",
-  "version": "1.0",
+  "version": "1.1",
 
   "description": "Adds a textbox to the GLS online banking, to extract IBAN, BIC, etc. from the invoice text.",
 
