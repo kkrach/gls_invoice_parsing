@@ -15,6 +15,11 @@
       "matches": ["*://*.gls-online-filiale.de/*"],
       "js": ["invoice_parsing.js"]
     }
-  ]
-
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "gls_invoice_parsing@kkrach.de",
+      "strict_min_version": "42.0"
+    }
+  }
 }
